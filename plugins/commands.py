@@ -324,11 +324,12 @@ async def start(client, message):
                 f_caption = files1.caption
                 settings = await get_settings(int(grp_id))
                 DREAMX_CAPTION = settings.get('caption', CUSTOM_FILE_CAPTION)
-                if DREAMX_CAPTION:
-                    try:
-                       f_caption = DREAMX_CAPTION.format(file_name='' if title is None else title)
-                       logger.exception(e)
-                        f_caption = f_caption
+if DREAMX_CAPTION:
+    try:
+        f_caption = DREAMX_CAPTION.format(file_name='' if title is None else title)
+    except Exception as e:
+        logger.exception(e)
+        f_caption = f_caption  # Optional: you can remove this if f_caption was already set earlier
                 if f_caption is None:
                     f_caption = f"{clean_filename(files1.file_name)}"
                 
