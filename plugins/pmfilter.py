@@ -1860,8 +1860,9 @@ async def auto_filter(client, msg, spoll=False):
         if len(message.text) < 100:
             search = message.text
             search = search.lower()
-            user_name = message.from_user.first_name  # ✅ get user's first name
-            m = await message.reply_text(f'**Wᴀɪᴛ {user_name.upper()} Sᴇᴀʀᴄʜɪɴɢ Yᴏᴜʀ Qᴜᴇʀʏ :** **{search}...**', reply_to_message_id=message.id)
+            user = message.from_user
+            user_link = f'<a href="tg://user?id={user.id}">{user.first_name}</a>'  # ✅ get user's first name
+            m = await message.reply_text(f"<b>Wᴀɪᴛ {user_link} Sᴇᴀʀᴄʜɪɴɢ Yᴏᴜʀ Qᴜᴇʀʏ :</b> <b>{search}...</b>", reply_to_message_id=message.id)
             find = search.split(" ")
             search = ""
             removes = ["in", "upload", "series", "full",
@@ -1896,8 +1897,9 @@ async def auto_filter(client, msg, spoll=False):
     else:
         message = msg.message.reply_to_message
         search, files, offset, total_results = spoll
-        user_name = message.from_user.first_name  # ✅ get user's first name
-        m = await message.reply_text(f'**Wᴀɪᴛ {user_name.upper()} Sᴇᴀʀᴄʜɪɴɢ Yᴏᴜʀ Qᴜᴇʀʏ :** **{search}...**', reply_to_message_id=message.id)
+        user = message.from_user
+        user_link = f'<a href="tg://user?id={user.id}">{user.first_name}</a>'  # ✅ get user's first name
+        m = await message.reply_text(f"<b>Wᴀɪᴛ {user_link} Sᴇᴀʀᴄʜɪɴɢ Yᴏᴜʀ Qᴜᴇʀʏ :</b> <b>{search}...</b>", reply_to_message_id=message.id)
         settings = await get_settings(message.chat.id)
         await msg.message.delete()
     key = f"{message.chat.id}-{message.id}"
