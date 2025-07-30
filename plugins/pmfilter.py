@@ -169,50 +169,40 @@ async def next_page(bot, query):
     temp.SHORT[query.from_user.id] = query.message.chat.id
     settings = await get_settings(query.message.chat.id)
     if settings.get('button'):
-       btn = [
-    [InlineKeyboardButton(
-        text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
-        callback_data=f'file#{file.file_id}'
-    )]
-    for file in files
-]
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           f'Qᴜᴀʟɪᴛʏ', callback_data=f"qualities#{key}"),
-                       InlineKeyboardButton(
-                           "Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
-                       InlineKeyboardButton(
-                           "Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
-                   ]
-                   )
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           "⚜️ 𝐑𝐞𝐦𝐨𝐯𝐞 𝐚𝐝𝐬 ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
-                           "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+        btn = [
+            [InlineKeyboardButton(
+                text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
+                callback_data=f'file#{file.file_id}'
+            )]
+            for file in files
+        ]
 
-                   ]
-                   )
+        btn.insert(0, [
+            InlineKeyboardButton("Qᴜᴀʟɪᴛʏ", callback_data=f"qualities#{key}"),
+            InlineKeyboardButton("Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
+            InlineKeyboardButton("Sᴇᴀsᴏɴ", callback_data=f"seasons#{key}")
+        ])
+
+        btn.insert(0, [
+            InlineKeyboardButton("⚜️ 𝐑𝐞ᴍᴏᴠᴇ 𝐚ᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
+            InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+        ])
 
     else:
         btn = []
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           f'Qᴜᴀʟɪᴛʏ', callback_data=f"qualities#{key}"),
-                       InlineKeyboardButton(
-                           "Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
-                       InlineKeyboardButton(
-                           "Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
-                   ]
-                   )
+
         btn.insert(0, [
-            InlineKeyboardButton(
-                "⚜️ 𝐑𝐞𝐦𝐨𝐯𝐞 𝐚𝐝𝐬 ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
+            InlineKeyboardButton("Qᴜᴀʟɪᴛʏ", callback_data=f"qualities#{key}"),
+            InlineKeyboardButton("Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
+            InlineKeyboardButton("Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
+        ])
+
+        btn.insert(0, [
+            InlineKeyboardButton("⚜️ 𝐑𝐞ᴍᴏᴠᴇ 𝐚ᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
             InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
         ])
+
+
     try:
         if settings['max_btn']:
             if 0 < offset <= 10:
@@ -406,50 +396,39 @@ async def filter_qualities_cb_handler(client: Client, query: CallbackQuery):
     temp.GETALL[key] = files
     settings = await get_settings(message.chat.id)
     if settings.get('button'):
-       btn = [
-    [InlineKeyboardButton(
-        text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
-        callback_data=f'file#{file.file_id}'
-    )]
-    for file in files
-]
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           f'Qᴜᴀʟɪᴛʏ', callback_data=f"qualities#{key}"),
-                       InlineKeyboardButton(
-                           "Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
-                       InlineKeyboardButton(
-                           "Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
-                   ]
-                   )
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           "⚜️ 𝐑𝐞𝐦𝐨𝐯𝐞 𝐚𝐝𝐬 ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
-                           "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
-                   ])
-    else:
-        btn = []
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           f'Qᴜᴀʟɪᴛʏ', callback_data=f"qualities#{key}"),
-                       InlineKeyboardButton(
-                           "Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
-                       InlineKeyboardButton(
-                           "Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
-                   ]
-                   )
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           "⚜️ 𝐑𝐞𝐦𝐨𝐯𝐞 𝐚𝐝𝐬 ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
-                           "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+    btn = [
+        [InlineKeyboardButton(
+            text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
+            callback_data=f'file#{file.file_id}'
+        )]
+        for file in files
+    ]
 
-                   ])
+    btn.insert(0, [
+        InlineKeyboardButton("Qᴜᴀʟɪᴛʏ", callback_data=f"qualities#{key}"),
+        InlineKeyboardButton("Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
+        InlineKeyboardButton("Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
+    ])
+
+    btn.insert(0, [
+        InlineKeyboardButton("⚜️ 𝐑𝐞ᴍᴏᴠᴇ 𝐚ᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
+        InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+    ])
+
+else:
+    btn = []
+
+    btn.insert(0, [
+        InlineKeyboardButton("Qᴜᴀʟɪᴛʏ", callback_data=f"qualities#{key}"),
+        InlineKeyboardButton("Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
+        InlineKeyboardButton("Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
+    ])
+
+    btn.insert(0, [
+        InlineKeyboardButton("⚜️ 𝐑𝐞ᴍᴏᴠᴇ 𝐚ᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
+        InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+    ])
+
     if offset != "":
         try:
             if settings['max_btn']:
@@ -564,50 +543,39 @@ async def filter_languages_cb_handler(client: Client, query: CallbackQuery):
     temp.GETALL[key] = files
     settings = await get_settings(message.chat.id)
     if settings.get('button'):
-        btn = [
-    [InlineKeyboardButton(
-        text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
-        callback_data=f'file#{file.file_id}'
-    )]
-    for file in files
-]
+    btn = [
+        [InlineKeyboardButton(
+            text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
+            callback_data=f'file#{file.file_id}'
+        )]
+        for file in files
+    ]
 
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           f'Qᴜᴀʟɪᴛʏ', callback_data=f"qualities#{key}"),
-                       InlineKeyboardButton(
-                           "Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
-                       InlineKeyboardButton(
-                           "Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
-                   ]
-                   )
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           "⚜️ 𝐑𝐞𝐦𝐨𝐯𝐞 𝐚𝐝𝐬 ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
-                           "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
-                   ]
-                   )
-    else:
-        btn = []
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           f'Qᴜᴀʟɪᴛʏ', callback_data=f"qualities#{key}"),
-                       InlineKeyboardButton(
-                           "Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
-                       InlineKeyboardButton(
-                           "Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
-                   ])
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           "⚜️ 𝐑𝐞𝐦𝐨𝐯𝐞 𝐚𝐝𝐬 ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
-                           "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
-                   ])
+    btn.insert(0, [
+        InlineKeyboardButton("Qᴜᴀʟɪᴛʏ", callback_data=f"qualities#{key}"),
+        InlineKeyboardButton("Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
+        InlineKeyboardButton("Sᴇᴀsᴏɴ", callback_data=f"seasons#{key}")
+    ])
+
+    btn.insert(0, [
+        InlineKeyboardButton("⚜️ 𝐑𝐞ᴍᴏᴠᴇ 𝐚ᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
+        InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+    ])
+
+else:
+    btn = []
+
+    btn.insert(0, [
+        InlineKeyboardButton("Qᴜᴀʟɪᴛʏ", callback_data=f"qualities#{key}"),
+        InlineKeyboardButton("Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
+        InlineKeyboardButton("Sᴇᴀsᴏɴ", callback_data=f"seasons#{key}")
+    ])
+
+    btn.insert(0, [
+        InlineKeyboardButton("⚜️ 𝐑𝐞ᴍᴏᴠᴇ 𝐚ᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
+        InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+    ])
+
     if offset != "":
         try:
             if settings['max_btn']:
@@ -714,17 +682,18 @@ async def filter_seasons_cb_handler(client: Client, query: CallbackQuery):
     settings = await get_settings(chat_id)
     btn: list[list[InlineKeyboardButton]] = []
     if settings.get("button"):
-       btn.extend(
-    [
+    btn.extend(
         [
-            InlineKeyboardButton(
-                text=f"[{get_size(f.file_size)}] {clean_filename(f.file_name)}",
-                callback_data=f'file#{f.file_id}'
-            )
+            [
+                InlineKeyboardButton(
+                    text=f"[{get_size(f.file_size)}] {clean_filename(f.file_name)}",
+                    callback_data=f'file#{f.file_id}'
+                )
+            ]
+            for f in files
         ]
-        for f in files
-    ]
-)
+    )
+
     btn.insert(
         0,
         [
@@ -733,14 +702,17 @@ async def filter_seasons_cb_handler(client: Client, query: CallbackQuery):
             InlineKeyboardButton("Sᴇᴀꜱᴏɴ", callback_data=f"seasons#{key}"),
         ],
     )
+
     btn.insert(
         0,
         [
             InlineKeyboardButton(
-                "⚜️ 𝐑𝐞𝐦𝐨𝐯𝐞 Aᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
+                "⚜️ 𝐑𝐞ᴍᴏᴠᴇ Aᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"
+            ),
             InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}"),
         ],
     )
+
     if n_offset != "":
         try:
             if settings['max_btn']:
@@ -1907,51 +1879,40 @@ async def auto_filter(client, msg, spoll=False):
     FRESH[key] = search
     temp.GETALL[key] = files
     temp.SHORT[message.from_user.id] = message.chat.id
-    if settings.get('button'):
-       btn = [
-    [InlineKeyboardButton(
-        text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
-        callback_data=f'file#{file.file_id}'
-    )]
-    for file in files
-]
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           f'Qᴜᴀʟɪᴛʏ', callback_data=f"qualities#{key}"),
-                       InlineKeyboardButton(
-                           "Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
-                       InlineKeyboardButton(
-                           "Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
-                   ]
-                   )
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           "⚜️ 𝐑𝐞𝐦𝐨𝐯𝐞 𝐚𝐝𝐬 ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
-                           "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+   if settings.get('button'):
+    btn = [
+        [InlineKeyboardButton(
+            text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
+            callback_data=f'file#{file.file_id}'
+        )]
+        for file in files
+    ]
 
-                   ])
-    else:
-        btn = []
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           f'Qᴜᴀʟɪᴛʏ', callback_data=f"qualities#{key}"),
-                       InlineKeyboardButton(
-                           "Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
-                       InlineKeyboardButton(
-                           "Sᴇᴀsᴏɴ",  callback_data=f"seasons#{key}")
-                   ]
-                   )
-        btn.insert(0,
-                   [
-                       InlineKeyboardButton(
-                           "⚜️ 𝐑𝐞𝐦𝐨𝐯𝐞 𝐚𝐝𝐬 ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
-                       InlineKeyboardButton(
-                           "Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
-                   ])
+    btn.insert(0, [
+        InlineKeyboardButton("Qᴜᴀʟɪᴛʏ", callback_data=f"qualities#{key}"),
+        InlineKeyboardButton("Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
+        InlineKeyboardButton("Sᴇᴀsᴏɴ", callback_data=f"seasons#{key}")
+    ])
+
+    btn.insert(0, [
+        InlineKeyboardButton("⚜️ 𝐑𝐞ᴍᴏᴠᴇ 𝐚ᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
+        InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+    ])
+
+else:
+    btn = []
+
+    btn.insert(0, [
+        InlineKeyboardButton("Qᴜᴀʟɪᴛʏ", callback_data=f"qualities#{key}"),
+        InlineKeyboardButton("Lᴀɴɢᴜᴀɢᴇ", callback_data=f"languages#{key}"),
+        InlineKeyboardButton("Sᴇᴀsᴏɴ", callback_data=f"seasons#{key}")
+    ])
+
+    btn.insert(0, [
+        InlineKeyboardButton("⚜️ 𝐑𝐞ᴍᴏᴠᴇ 𝐚ᴅꜱ ⚜️", url=f"https://t.me/{temp.U_NAME}?start=premium"),
+        InlineKeyboardButton("Sᴇɴᴅ Aʟʟ", callback_data=f"sendfiles#{key}")
+    ])
+
 
     if offset != "":
         req = message.from_user.id if message.from_user else 0
