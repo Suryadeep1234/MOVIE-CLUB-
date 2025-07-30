@@ -326,8 +326,7 @@ async def start(client, message):
                 DREAMX_CAPTION = settings.get('caption', CUSTOM_FILE_CAPTION)
                 if DREAMX_CAPTION:
                     try:
-                        f_caption=DREAMX_CAPTION.format(file_name= '' if title is None else title, file_size='' if size is None else size, file_caption='' if f_caption is None else f_caption)
-                    except Exception as e:
+                       f_caption = DREAMX_CAPTION.format(file_name='' if title is None else title)
                         logger.exception(e)
                         f_caption = f_caption
                 if f_caption is None:
@@ -413,7 +412,7 @@ async def start(client, message):
             DREAMX_CAPTION = settings.get('caption', CUSTOM_FILE_CAPTION)
             if DREAMX_CAPTION:
                 try:
-                    f_caption=DREAMX_CAPTION.format(file_name= '' if title is None else title, file_size='' if size is None else size, file_caption='')
+                    f_caption = DREAMX_CAPTION.format(file_name='' if title is None else title)
                 except:
                     return
             await msg.edit_caption(
