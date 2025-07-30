@@ -327,7 +327,7 @@ async def start(client, message):
                 if DREAMX_CAPTION:
                     try:
                        f_caption = DREAMX_CAPTION.format(file_name='' if title is None else title)
-                        logger.exception(e)
+                       logger.exception(e)
                         f_caption = f_caption
                 if f_caption is None:
                     f_caption = f"{clean_filename(files1.file_name)}"
