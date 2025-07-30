@@ -169,15 +169,13 @@ async def next_page(bot, query):
     temp.SHORT[query.from_user.id] = query.message.chat.id
     settings = await get_settings(query.message.chat.id)
     if settings.get('button'):
-        btn = [
-            [
-                InlineKeyboardButton(
-    text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
-    callback_data=f'file#{file.file_id}'
-                )
-            ]
-            for file in files
-        ]
+       btn = [
+    [InlineKeyboardButton(
+        text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
+        callback_data=f'file#{file.file_id}'
+    )]
+    for file in files
+]
         btn.insert(0,
                    [
                        InlineKeyboardButton(
@@ -408,15 +406,13 @@ async def filter_qualities_cb_handler(client: Client, query: CallbackQuery):
     temp.GETALL[key] = files
     settings = await get_settings(message.chat.id)
     if settings.get('button'):
-        btn = [
-            [
-               InlineKeyboardButton(
-    text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
-    callback_data=f'file#{file.file_id}'
-                )
-            ]
-            for file in files
-        ]
+       btn = [
+    [InlineKeyboardButton(
+        text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
+        callback_data=f'file#{file.file_id}'
+    )]
+    for file in files
+]
         btn.insert(0,
                    [
                        InlineKeyboardButton(
@@ -569,14 +565,13 @@ async def filter_languages_cb_handler(client: Client, query: CallbackQuery):
     settings = await get_settings(message.chat.id)
     if settings.get('button'):
         btn = [
-            [
-                InlineKeyboardButton(
-    text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
-    callback_data=f'file#{file.file_id}'
-                )
-            ]
-            for file in files
-        ]
+    [InlineKeyboardButton(
+        text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
+        callback_data=f'file#{file.file_id}'
+    )]
+    for file in files
+]
+
         btn.insert(0,
                    [
                        InlineKeyboardButton(
@@ -719,17 +714,17 @@ async def filter_seasons_cb_handler(client: Client, query: CallbackQuery):
     settings = await get_settings(chat_id)
     btn: list[list[InlineKeyboardButton]] = []
     if settings.get("button"):
-        btn.extend(
-            [
-                [
-                    InlineKeyboardButton(
-    text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
-    callback_data=f'file#{file.file_id}'
-                )
-                ]
-                for f in files
-            ]
-        )
+       btn.extend(
+    [
+        [
+            InlineKeyboardButton(
+                text=f"[{get_size(f.file_size)}] {clean_filename(f.file_name)}",
+                callback_data=f'file#{f.file_id}'
+            )
+        ]
+        for f in files
+    ]
+)
     btn.insert(
         0,
         [
@@ -1913,15 +1908,13 @@ async def auto_filter(client, msg, spoll=False):
     temp.GETALL[key] = files
     temp.SHORT[message.from_user.id] = message.chat.id
     if settings.get('button'):
-        btn = [
-            [
-                InlineKeyboardButton(
-    text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
-    callback_data=f'file#{file.file_id}'
-                )
-            ]
-            for file in files
-        ]
+       btn = [
+    [InlineKeyboardButton(
+        text=f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}",
+        callback_data=f'file#{file.file_id}'
+    )]
+    for file in files
+]
         btn.insert(0,
                    [
                        InlineKeyboardButton(
