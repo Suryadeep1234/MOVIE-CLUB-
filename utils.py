@@ -107,7 +107,12 @@ async def is_check_admin(bot, chat_id, user_id):
     
 async def users_broadcast(user_id, message, is_pin):
     try:
-        m=await message.copy(chat_id=user_id)
+        await message.copy(
+            chat_id=user_id,
+            reply_markup=InlineKeyboardMarkup(
+                [[InlineKeyboardButton("Search Here", url="https://t.me/MC_MOVIES_PVT")]]
+            )
+        )
         if is_pin:
             await m.pin(both_sides=True)
         return True, "Success"
@@ -131,7 +136,12 @@ async def users_broadcast(user_id, message, is_pin):
 
 async def groups_broadcast(chat_id, message, is_pin):
     try:
-        m = await message.copy(chat_id=chat_id)
+        kd = await message.copy(
+            chat_id=chat_id,
+            reply_markup=InlineKeyboardMarkup(
+                [[InlineKeyboardButton("Search Here", url="https://t.me/MC_MOVIES_PVT")]]
+            )
+        )
         if is_pin:
             try:
                 await m.pin()
