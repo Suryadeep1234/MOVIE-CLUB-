@@ -167,7 +167,6 @@ class Database:
             'third_verify_time': THREE_VERIFY_GAP,
             'caption': CUSTOM_FILE_CAPTION,
             'fsub': AUTH_CHANNELS,
-            'reqfsub': AUTH_REQ_CHANNELS
         }
         chat = await self.grp.find_one({'id':int(id)})
         if chat and 'settings' in chat:
@@ -420,11 +419,7 @@ class Database:
 
     async def update_movie_update_status(self, bot_id, enable):
         await self.update_bot_setting(bot_id, 'MOVIE_UPDATE_NOTIFICATION', enable)
-
-    async def reset_group_settings(self, id):
-        await self.grp.update_one({"id": int(id)}, {"$set": {"settings": self.default}})   
-        
+     
 db = Database(DATABASE_URI, DATABASE_NAME)    
 db2 = Database(DATABASE_URI2, DATABASE_NAME)
-
 
