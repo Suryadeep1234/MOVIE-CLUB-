@@ -2024,11 +2024,15 @@ async def auto_filter(client, msg, spoll=False):
             **locals()
         )
         temp.IMDB_CAP[message.from_user.id] = cap
-        if not settings.get('button'):
-            cap += "\n\n<b>🧾 <u>Your Requested Files Are Here</u> 👇</b>"
-            for idx, file in enumerate(files, start=1):
-                cap += f"<b>\n{idx}. <a href='https://telegram.me/{temp.U_NAME}?start=file_{message.chat.id}_{file.file_id}'>[{get_size(file.file_size)}] {clean_filename(file.file_name)}\n</a></b>"
-    else:
+
+if not settings.get('button'):
+    cap += "\n\n<b>🧾 <u>Your Requested Files Are Here</u> 👇</b>"
+    for idx, file in enumerate(files, start=1):
+        cap += (
+            f"<b>\n{idx}. <a href='https://telegram.me/{temp.U_NAME}?start=file_{message.chat.id}_{file.file_id}'>"
+            f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}\n</a></b>"
+        )
+else:
     if settings.get('button'):
         cap = (
             f"<b>Query:</b> <b>{query}</b>\n\n"
@@ -2059,8 +2063,12 @@ async def auto_filter(client, msg, spoll=False):
             f"<b>⏰ Result Shown in:</b> <b><i>{remaining_seconds}</i> seconds</b> 🔥<br><br>"
             f"<b>Requested by:</b> <b>{message.from_user.mention}</b>"
         )
-            for idx, file in enumerate(files, start=1):
-                cap += f"<b>\n{idx}. <a href='https://telegram.me/{temp.U_NAME}?start=file_{message.chat.id}_{file.file_id}'>[{get_size(file.file_size)}] {clean_filename(file.file_name)}\n</a></b>"
+        cap += "\n\n<b>🧾 <u>Your Requested Files Are Here</u> 👇</b>"
+        for idx, file in enumerate(files, start=1):
+            cap += (
+                f"<b>\n{idx}. <a href='https://telegram.me/{temp.U_NAME}?start=file_{message.chat.id}_{file.file_id}'>"
+                f"[{get_size(file.file_size)}] {clean_filename(file.file_name)}\n</a></b>"
+            )
     if imdb and imdb.get('poster'):
         try:
             hehe = await message.reply_photo(photo=imdb.get('poster'), caption=cap, reply_markup=InlineKeyboardMarkup(btn), parse_mode=enums.ParseMode.HTML)
