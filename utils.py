@@ -1,24 +1,19 @@
 import re
 import os
 import logging
-from info import *
+from info import  *
 from imdb import Cinemagoer 
 import asyncio
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram.errors import (
-    InputUserDeactivated, UserNotParticipant, FloodWait, UserIsBlocked,
-    PeerIdInvalid, ChatAdminRequired, MessageNotModified
-)
+from pyrogram.errors import InputUserDeactivated, UserNotParticipant, FloodWait, UserIsBlocked, PeerIdInvalid, ChatAdminRequired, MessageNotModified
 from pyrogram import enums
-from typing import Union, List
+from typing import Union
 from Script import script
+from typing import List
 from database.users_chats_db import db
 from bs4 import BeautifulSoup
 import requests
 from shortzy import Shortzy
-
-# ⚠️ Removed circular import
-# from plugins.Dreamxfutures.Imdbposter import get_movie_detailsx   <-- DELETE THIS LINE
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -27,20 +22,22 @@ BTN_URL_REGEX = re.compile(
     r"(\[([^\[]+?)\]\((buttonurl|buttonalert):(?:/{0,2})(.+?)(:same)?\))"
 )
 
-imdb = Cinemagoer()
+
+imdb = Cinemagoer() 
 BANNED = {}
 SMART_OPEN = '“'
 SMART_CLOSE = '”'
 START_CHAR = ('\'', '"', SMART_OPEN)
 
-class temp(object):
+
+class temp(object):   
     BANNED_USERS = []
     BANNED_CHATS = []
     ME = None
-    CURRENT = int(os.environ.get("SKIP", 2))
+    CURRENT=int(os.environ.get("SKIP", 2))
     CANCEL = False
     B_USERS_CANCEL = False
-    B_GROUPS_CANCEL = False
+    B_GROUPS_CANCEL = False 
     MELCOW = {}
     U_NAME = None
     B_NAME = None
@@ -51,9 +48,6 @@ class temp(object):
     IMDB_CAP = {}
     VERIFICATIONS = {}
     TEMP_INVITE_LINKS = {}
-
-
-# ---------------------- SUBSCRIPTION CHECKS ----------------------
 
 async def is_req_subscribed(bot, user_id, rqfsub_channels):
     btn = []
@@ -71,38 +65,36 @@ async def is_req_subscribed(bot, user_id, rqfsub_channels):
             logger.error(f"Error checking membership in {ch_id}: {e}")
 
         try:
-            chat = await bot.get_chat(ch_id)
+            chat   = await bot.get_chat(ch_id)
             invite = await bot.create_chat_invite_link(
-                ch_id, creates_join_request=True
+                ch_id,
+                creates_join_request=True
             )
             btn.append([InlineKeyboardButton(f"⛔️ Join {chat.title}", url=invite.invite_link)])
         except ChatAdminRequired:
             logger.warning(f"Bot not admin in {ch_id}")
         except Exception as e:
             logger.warning(f"Invite link error for {ch_id}: {e}")
+            
     return btn
+
+
 
 
 async def is_subscribed(bot, user_id, fsub_channels):
     btn = []
-    async def check_channel(channel_id):
+    for channel_id in fsub_channels:
         try:
+            chat = await bot.get_chat(int(channel_id))
             await bot.get_chat_member(channel_id, user_id)
         except UserNotParticipant:
             try:
-                chat = await bot.get_chat(int(channel_id))
-                invite_link = await bot.create_chat_invite_link(channel_id)
-                return InlineKeyboardButton(f"📢 Join {chat.title}", url=invite_link.invite_link)
+                invite = await bot.create_chat_invite_link(channel_id, creates_join_request=False)
+                btn.append([InlineKeyboardButton(f"📢 Join {chat.title}", url=invite.invite_link)])
             except Exception as e:
                 logger.warning(f"Failed to create invite for {channel_id}: {e}")
         except Exception as e:
             logger.exception(f"is_subscribed error for {channel_id}: {e}")
-        return None
-
-    results = await asyncio.gather(*[check_channel(cid) for cid in fsub_channels])
-    for button in results:
-        if button:
-            btn.append([button])
     return btn
 
 
@@ -112,177 +104,185 @@ async def is_check_admin(bot, chat_id, user_id):
         return member.status in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]
     except:
         return False
-
-
-# ---------------------- BROADCAST HELPERS ----------------------
-
+    
 async def users_broadcast(user_id, message, is_pin):
     try:
-        button = InlineKeyboardMarkup(
-            [[InlineKeyboardButton("🔍 Search Here", url="https://t.me/MC_MOVIES_PVT")]]
+        await message.copy(
+            chat_id=user_id,
+            reply_markup=InlineKeyboardMarkup(
+                [[InlineKeyboardButton("Search Here", url="https://t.me/MC_MOVIES_PVT")]]
+            )
         )
-        m = await message.copy(chat_id=user_id, reply_markup=button)
         if is_pin:
-            try:
-                await m.pin(both_sides=True)
-            except Exception:
-                pass
+            await m.pin(both_sides=True)
         return True, "Success"
     except FloodWait as e:
-        await asyncio.sleep(e.value)
-        return await users_broadcast(user_id, message, is_pin)
+        await asyncio.sleep(e.x)
+        return await users_broadcast(user_id, message)
     except InputUserDeactivated:
         await db.delete_user(int(user_id))
+        logging.info(f"{user_id}-Removed from Database, since deleted account.")
         return False, "Deleted"
     except UserIsBlocked:
+        logging.info(f"{user_id} -Blocked the bot.")
         await db.delete_user(user_id)
         return False, "Blocked"
     except PeerIdInvalid:
         await db.delete_user(int(user_id))
+        logging.info(f"{user_id} - PeerIdInvalid")
         return False, "Error"
     except Exception as e:
-        logger.error(f"Broadcast error: {e}")
         return False, "Error"
-
 
 async def groups_broadcast(chat_id, message, is_pin):
     try:
-        button = InlineKeyboardMarkup(
-            [[InlineKeyboardButton("🔍 Search Here", url="https://t.me/MC_MOVIES_PVT")]]
+        kd = await message.copy(
+            chat_id=chat_id,
+            reply_markup=InlineKeyboardMarkup(
+                [[InlineKeyboardButton("Search Here", url="https://t.me/MC_MOVIES_PVT")]]
+            )
         )
-        m = await message.copy(chat_id=chat_id, reply_markup=button)
         if is_pin:
             try:
                 await m.pin()
-            except Exception as e:
-                logger.warning(f"Couldn't pin message in {chat_id}: {e}")
+            except:
+                pass
         return "Success"
     except FloodWait as e:
-        await asyncio.sleep(e.value)
-        return await groups_broadcast(chat_id, message, is_pin)
+        await asyncio.sleep(e.x)
+        return await groups_broadcast(chat_id, message)
     except Exception as e:
-        logger.error(f"Group broadcast error in {chat_id}: {e}")
         await db.delete_chat(chat_id)
         return "Error"
 
-
-# ---------------------- POSTER FETCHERS ----------------------
-
-async def get_posterx(query, bulk=False, id=False, file=None):
-    """
-    Fetch movie details from TMDB using get_movie_detailsx (lazy import).
-    """
-    from plugins.Dreamxfutures.Imdbposter import get_movie_detailsx  # ✅ moved inside to break circular import
-
-    if not id:
-        details = await get_movie_detailsx(query, file=file)
-    else:
-        details = await get_movie_detailsx(query, id=True)
-
-    if not details or details.get("error"):
-        return None
-
-    plot = details.get('plot', "")
-    if plot and len(plot) > 800:
-        plot = plot[:800] + "..."
-
-    def list_to_str(val):
-        if isinstance(val, list):
-            return ", ".join(str(x) for x in val if x)
-        return str(val) if val else ""
-
-    return {
-        'title': details.get('title'),
-        'votes': details.get('votes'),
-        "aka": None,
-        "seasons": details.get('seasons'),
-        "box_office": details.get('box_office'),
-        'localized_title': details.get('localized_title'),
-        'kind': 'movie' if 'movie' in details.get('tmdb_url', '') else 'tv series',
-        "imdb_id": details.get('imdb_id'),
-        "cast": list_to_str(details.get("cast")),
-        "runtime": list_to_str(details.get("runtime")),
-        "countries": list_to_str(details.get("countries")),
-        "certificates": list_to_str(details.get("certificates")),
-        "languages": list_to_str(details.get("languages")),
-        "director": list_to_str(details.get("director")),
-        "writer": list_to_str(details.get("writer")),
-        "producer": list_to_str(details.get("producer")),
-        "composer": list_to_str(details.get("composer")),
-        "cinematographer": list_to_str(details.get("cinematographer")),
-        "music_team": None,
-        "distributors": list_to_str(details.get("distributors")),
-        'release_date': details.get('release_date'),
-        'year': details.get('year'),
-        'genres': list_to_str(details.get("genres")),
-        'poster': details.get('poster_url'),
-        'backdrop': details.get('backdrop_url'),
-        'plot': plot,
-        'rating': str(details.get("rating", "N/A")),
-        'url': details.get('tmdb_url')
-    }
+async def junk_group(chat_id, message):
+    try:
+        kk = await message.copy(chat_id=chat_id)
+        await kk.delete(True)
+        return True, "Succes", 'mm'
+    except FloodWait as e:
+        await asyncio.sleep(e.value)
+        return await junk_group(chat_id, message)
+    except Exception as e:
+        await db.delete_chat(int(chat_id))       
+        logging.info(f"{chat_id} - PeerIdInvalid")
+        return False, "deleted", f'{e}\n\n'
     
-async def get_posterx(query, bulk=False, id=False, file=None):
-    """
-    Fetches movie details from TMDB using the get_movie_detailsx helper
-    and formats the output to be compatible with the original get_poster function.
-    """
-    if not id:
-        # The get_movie_detailsx function handles searching by query string.
-        details = await get_movie_detailsx(query, file=file)
-    else:
-        # Assumes the 'id' is a TMDB ID or IMDb ID that get_movie_detailsx can handle.
-        details = await get_movie_detailsx(query, id=True)
 
-    if not details or details.get("error"):
-        return None
+async def clear_junk(user_id, message):
+    try:
+        key = await message.copy(chat_id=user_id)
+        await key.delete(True)
+        return True, "Success"
+    except FloodWait as e:
+        await asyncio.sleep(e.value)
+        return await clear_junk(user_id, message)
+    except InputUserDeactivated:
+        await db.delete_user(int(user_id))
+        logging.info(f"{user_id}-Removed from Database, since deleted account.")
+        return False, "Deleted"
+    except UserIsBlocked:
+        logging.info(f"{user_id} -Blocked the bot.")
+        return False, "Blocked"
+    except PeerIdInvalid:
+        await db.delete_user(int(user_id))
+        logging.info(f"{user_id} - PeerIdInvalid")
+        return False, "Error"
+    except Exception as e:
+        return False, "Error"
+     
+async def get_status(bot_id):
+    try:
+        return await db.movie_update_status(bot_id) or False  
+    except Exception as e:
+        logging.error(f"Error in get_movie_update_status: {e}")
+        return False  
+
+async def add_name_to_db(filename):
+    """
+    Helper function to add a filename to the database.
+    """
     
+    return await db.add_name(filename) 
+
+async def get_poster(query, bulk=False, id=False, file=None):
+    if not id:
+        query = (query.strip()).lower()
+        title = query
+        year = re.findall(r'[1-2]\d{3}$', query, re.IGNORECASE)
+        imdb
+        if year:
+            year = list_to_str(year[:1])
+            title = (query.replace(year, "")).strip()
+        elif file is not None:
+            year = re.findall(r'[1-2]\d{3}', file, re.IGNORECASE)
+            if year:
+                year = list_to_str(year[:1]) 
+        else:
+            year = None
+        movieid = imdb.search_movie(title.lower(), results=10)
+        if not movieid:
+            return None
+        if year:
+            filtered=list(filter(lambda k: str(k.get('year')) == str(year), movieid))
+            if not filtered:
+                filtered = movieid
+        else:
+            filtered = movieid
+        movieid=list(filter(lambda k: k.get('kind') in ['movie', 'tv series'], filtered))
+        if not movieid:
+            movieid = filtered
+        if bulk:
+            return movieid
+        movieid = movieid[0].movieID
+    else:
+        movieid = query
+    movie = imdb.get_movie(movieid)
+    imdb.update(movie, info=['main', 'vote details'])
+    if movie.get("original air date"):
+        date = movie["original air date"]
+    elif movie.get("year"):
+        date = movie.get("year")
+    else:
+        date = "N/A"
     plot = ""
     if not LONG_IMDB_DESCRIPTION:
-        plot = details.get('plot')
+        plot = movie.get('plot')
         if plot and len(plot) > 0:
             plot = plot[0]
     else:
-        plot = details.get('plot outline')
+        plot = movie.get('plot outline')
     if plot and len(plot) > 800:
         plot = plot[0:800] + "..."
 
-    # --- Mapping TMDB keys to the original IMDb key format ---
-
-    def list_to_str(val):
-        if isinstance(val, list):
-            return ", ".join(str(x) for x in val if x)
-        return str(val) if val else ""
-
     return {
-        'title': details.get('title'),
-        'votes': details.get('votes'),
-        "aka": None,  # Not typically provided by TMDB in this format
-        "seasons": details.get('seasons'),
-        "box_office": details.get('box_office'),
-        'localized_title': details.get('localized_title'),
-        'kind': 'movie' if 'movie' in details.get('tmdb_url', '') else 'tv series',
-        "imdb_id": details.get('imdb_id'),
-        "cast": list_to_str(details.get("cast")),
-        "runtime": list_to_str(details.get("runtime")),
-        "countries": list_to_str(details.get("countries")),
-        "certificates": list_to_str(details.get("certificates")),
-        "languages": list_to_str(details.get("languages")),
-        "director": list_to_str(details.get("director")),
-        "writer": list_to_str(details.get("writer")),
-        "producer": list_to_str(details.get("producer")),
-        "composer": list_to_str(details.get("composer")),
-        "cinematographer": list_to_str(details.get("cinematographer")),
-        "music_team": None, # Not provided by the TMDB API wrapper
-        "distributors": list_to_str(details.get("distributors")),
-        'release_date': details.get('release_date'),
-        'year': details.get('year'),
-        'genres': list_to_str(details.get("genres")),
-        'poster': details.get('poster_url'),
-        'backdrop' : details.get('backdrop_url'),
+        'title': movie.get('title'),
+        'votes': movie.get('votes'),
+        "aka": list_to_str(movie.get("akas")),
+        "seasons": movie.get("number of seasons"),
+        "box_office": movie.get('box office'),
+        'localized_title': movie.get('localized title'),
+        'kind': movie.get("kind"),
+        "imdb_id": f"tt{movie.get('imdbID')}",
+        "cast": list_to_str(movie.get("cast")),
+        "runtime": list_to_str(movie.get("runtimes")),
+        "countries": list_to_str(movie.get("countries")),
+        "certificates": list_to_str(movie.get("certificates")),
+        "languages": list_to_str(movie.get("languages")),
+        "director": list_to_str(movie.get("director")),
+        "writer":list_to_str(movie.get("writer")),
+        "producer":list_to_str(movie.get("producer")),
+        "composer":list_to_str(movie.get("composer")) ,
+        "cinematographer":list_to_str(movie.get("cinematographer")),
+        "music_team": list_to_str(movie.get("music department")),
+        "distributors": list_to_str(movie.get("distributors")),
+        'release_date': date,
+        'year': movie.get('year'),
+        'genres': list_to_str(movie.get("genres")),
+        'poster': movie.get('full-size cover url'),
         'plot': plot,
-        'rating': str(details.get("rating", "N/A")),
-        'url': details.get('tmdb_url')
+        'rating': str(movie.get("rating")),
+        'url':f'https://www.imdb.com/title/tt{movieid}'
     }
     
 async def search_gagala(text):
@@ -326,6 +326,11 @@ async def save_group_settings(group_id, key, value):
     current.update({key: value})
     temp.SETTINGS.update({group_id: current})
     await db.update_settings(group_id, current)
+
+async def save_default_settings(id):
+    await db.reset_group_settings(id)
+    current = await db.get_settings(id)
+    temp.SETTINGS.update({id: current})
 
 def clean_filename(file_name):
     prefixes = ('[', '@', 'www.')
@@ -384,7 +389,7 @@ def generate_settings_text(settings, title, reset_done=False):
 
 📝 <b>ʟᴏɢ ᴄʜᴀɴɴᴇʟ ɪᴅ</b> - <code>{settings.get("log", "N/A")}</code>
 🚫 <b>ꜰꜱᴜʙ ᴄʜᴀɴɴᴇʟ ɪᴅ</b> - <code>{settings.get("fsub", "N/A")}</code>
-
+🚫 <b>ʀᴇǫ ғꜱᴜʙ ᴄʜᴀɴɴᴇʟ ɪᴅ</b> - <code>{settings.get("reqfsub", "N/A")}</code> #update
 
 🎯 <b>ɪᴍᴅʙ ᴛᴇᴍᴘʟᴀᴛᴇ</b> - <code>{settings.get("template", "N/A")}</code>
 
@@ -715,30 +720,6 @@ async def get_seconds(time_string):
         return 0
     
 
-def clean_search_text(search_raw: str) -> str:
-    search_lower = search_raw.lower()
-    phrases = re.split(r'\s{2,}', search_lower.strip())
-    lang_pattern = r'\b(hin(di)?|eng(lish)?|mal(ayalam)?|tam(il)?|tel(ugu)?|kan(nada)?|ben(gali)?|mar(athi)?|urdu|guj(arat)?|punj(abi)?)\b'
-    season_pattern = r's(eason)?\s*0*\d+'
-    quality_pattern = r'\b(360p|480p|720p|1080p|1440p|2160p|4k)\b'  
-    cleaned_phrases = []
-    for phrase in phrases:
-        phrase = re.sub(season_pattern, '', phrase, flags=re.IGNORECASE)
-        phrase = re.sub(lang_pattern, '', phrase, flags=re.IGNORECASE)
-        phrase = re.sub(quality_pattern, '', phrase, flags=re.IGNORECASE)
-        phrase = re.sub(r'\s+', ' ', phrase).strip()
-        if phrase:
-            cleaned_phrases.append(phrase)
-    unique_phrases = []
-    seen = set()
-    for cp in cleaned_phrases:
-        if cp not in seen:
-            unique_phrases.append(cp)
-            seen.add(cp)
-    if unique_phrases:
-        return unique_phrases[0].title()
-    else:
-        return ""
 
 async def get_cap(settings, remaining_seconds, files, query, total_results, search, offset=0):
     try:
@@ -746,7 +727,7 @@ async def get_cap(settings, remaining_seconds, files, query, total_results, sear
             IMDB_CAP = temp.IMDB_CAP.get(query.from_user.id)
             if IMDB_CAP:
                 cap = IMDB_CAP
-                cap += "\n\n<u>Your Requested Files Are Here</u>\n\n</b>"
+                cap += "\n\n🧾 <u>Your Requested Files Are Here</u> 👇\n\n</b>"
                 for idx, file in enumerate(files, start=offset + 1):
                         cap += (
                             f"<b>{idx}. "
@@ -757,10 +738,7 @@ async def get_cap(settings, remaining_seconds, files, query, total_results, sear
                             f"</a></b>"
                         )
             else:
-                if settings["imdb"]:
-                    imdb = await get_posterx(search, file=(files[0]).file_name) if TMDB_ON_SEARCH else await get_poster(search, file=(files[0]).file_name)
-                else:
-                    imdb = None
+                imdb = await get_poster(search, file=(files[0]).file_name) if settings["imdb"] else None
                 if imdb:
                     TEMPLATE = script.IMDB_TEMPLATE_TXT
                     cap = TEMPLATE.format(
@@ -794,7 +772,6 @@ async def get_cap(settings, remaining_seconds, files, query, total_results, sear
                         url=imdb['url'],
                         **locals()
                     )
-                    
                     for idx, file in enumerate(files, start=offset+1):
                         cap += (
                             f"<b>{idx}. "
@@ -805,22 +782,14 @@ async def get_cap(settings, remaining_seconds, files, query, total_results, sear
                             f"</a></b>"
                         )
                 else:
-                    if ULTRA_FAST_MODE:
-                        cap = (
-                            f"<b>🏷 ᴛɪᴛʟᴇ : <code>{search}</code>\n"
-                            f"⏰ ʀᴇsᴜʟᴛ ɪɴ : <code>{remaining_seconds} Sᴇᴄᴏɴᴅs</code>\n\n"
-                            f"📝 ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ : {query.from_user.mention}\n"
-                            f"⚜️ ᴘᴏᴡᴇʀᴇᴅ ʙʏ :⚡ {query.message.chat.title or temp.B_LINK or 'ᴅʀᴇᴀᴍxʙᴏᴛᴢ'}\n</b>"
-                        )
-                    else:
-                        cap = (
-                            f"<b>🏷 ᴛɪᴛʟᴇ : <code>{search}</code>\n"
-                            f"🧱 ᴛᴏᴛᴀʟ ꜰɪʟᴇꜱ : <code>{total_results}</code>\n"
-                            f"⏰ ʀᴇsᴜʟᴛ ɪɴ : <code>{remaining_seconds} Sᴇᴄᴏɴᴅs</code>\n\n"
-                            f"📝 ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ : {query.from_user.mention}\n"
-                            f"⚜️ ᴘᴏᴡᴇʀᴇᴅ ʙʏ :⚡ {query.message.chat.title or temp.B_LINK or 'ᴅʀᴇᴀᴍxʙᴏᴛᴢ'}\n</b>"
-                        )
-                    cap += "\n\n<u>Your Requested Files Are Here</u> \n\n</b>"
+                    cap = (
+                        f"<b>🏷 ᴛɪᴛʟᴇ : <code>{search}</code>\n"
+                        f"🧱 ᴛᴏᴛᴀʟ ꜰɪʟᴇꜱ : <code>{total_results}</code>\n"
+                        f"⏰ ʀᴇsᴜʟᴛ ɪɴ : <code>{remaining_seconds} Sᴇᴄᴏɴᴅs</code>\n\n"
+                        f"📝 ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ : {query.from_user.mention}\n"
+                        f"⚜️ ᴘᴏᴡᴇʀᴇᴅ ʙʏ :⚡ {query.message.chat.title}\n</b>"
+                    )
+                    cap += "\n\n🧾 <u>Your Requested Files Are Here</u> 👇 👇\n\n</b>"
                     for idx, file in enumerate(files, start=offset + 1):
                         cap += (
                             f"<b>{idx}. "
@@ -832,22 +801,13 @@ async def get_cap(settings, remaining_seconds, files, query, total_results, sear
                         )
 
         else:
-            if ULTRA_FAST_MODE:
-                cap = (
-                    f"<b>🏷 ᴛɪᴛʟᴇ : <code>{search}</code>\n"
-                    f"⏰ ʀᴇsᴜʟᴛ ɪɴ : <code>{remaining_seconds} Sᴇᴄᴏɴᴅs</code>\n\n"
-                    f"⚜️ ᴘᴏᴡᴇʀᴇᴅ ʙʏ : ⚡ {query.message.chat.title or temp.B_LINK or 'ᴅʀᴇᴀᴍxʙᴏᴛᴢ'}\n</b>"
-                )
-            else:
-                cap = (
-                    f"<b>🏷 ᴛɪᴛʟᴇ : <code>{search}</code>\n"
-                    f"🧱 ᴛᴏᴛᴀʟ ꜰɪʟᴇꜱ : <code>{total_results}</code>\n"
-                    f"⏰ ʀᴇsᴜʟᴛ ɪɴ : <code>{remaining_seconds} Sᴇᴄᴏɴᴅs</code>\n\n"
-                    f"📝 ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ : {query.from_user.mention}\n"
-                    f"⚜️ ᴘᴏᴡᴇʀᴇᴅ ʙʏ : ⚡ {query.message.chat.title or temp.B_LINK or 'ᴅʀᴇᴀᴍxʙᴏᴛᴢ'}\n</b>"
-                )
-
-            cap += "\n\n<u>Your Requested Files Are Here</u>\n\n</b>"
+            cap = (
+                f"<b>🏷 ᴛɪᴛʟᴇ : <code>{search}</code>\n"
+                f"🧱 ᴛᴏᴛᴀʟ ꜰɪʟᴇꜱ : <code>{total_results}</code>\n\n"
+                f"📝 ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ : {query.from_user.mention}\n"
+                f"⚜️ ᴘᴏᴡᴇʀᴇᴅ ʙʏ : ⚡ {query.message.chat.title or temp.B_LINK or 'ᴅʀᴇᴀᴍxʙᴏᴛᴢ'}\n</b>"
+            )
+            cap += "\n\n🧾 <u>Your Requested Files Are Here</u> 👇\n\n</b>"
             for idx, file in enumerate(files, start=offset):
                         cap += (
                             f"<b>{idx}. "
@@ -861,3 +821,4 @@ async def get_cap(settings, remaining_seconds, files, query, total_results, sear
     except Exception as e:
         logging.error(f"Error in get_cap: {e}")
         pass
+       
