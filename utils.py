@@ -141,7 +141,7 @@ async def users_broadcast(user_id, message, is_pin):
 
 async def groups_broadcast(chat_id, message, is_pin):
     try:
-       kd = await message.copy(
+        kd = await message.copy(
             chat_id=chat_id,
             reply_markup=InlineKeyboardMarkup(
                 [[InlineKeyboardButton("Search Here", url="https://t.me/MC_MOVIES_PVT")]]
@@ -149,8 +149,8 @@ async def groups_broadcast(chat_id, message, is_pin):
         )
         if is_pin:
             try:
-                await m.pin()
-            except:
+                await kd.pin()
+            except Exception:
                 pass
         return "Success"
     except FloodWait as e:
