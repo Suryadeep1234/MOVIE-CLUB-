@@ -2030,9 +2030,39 @@ async def auto_filter(client, msg, spoll=False):
                 cap += f"<b>\n{idx}. <a href='https://telegram.me/{temp.U_NAME}?start=file_{message.chat.id}_{file.file_id}'>[{get_size(file.file_size)}] {clean_filename(file.file_name)}\n</a></b>"
     else:
         if settings.get('button'):
-            cap = f"<b>🏷 ᴛɪᴛʟᴇ : <code>{search}</code>\n🧱 ᴛᴏᴛᴀʟ ꜰɪʟᴇꜱ : <code>{total_results}</code>\n⏰ ʀᴇsᴜʟᴛ ɪɴ : <code>{remaining_seconds} Sᴇᴄᴏɴᴅs</code>\n\n📝 ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ : {message.from_user.mention}\n⚜️ ᴘᴏᴡᴇʀᴇᴅ ʙʏ : ⚡ {message.chat.title or temp.B_LINK or 'ᴅʀᴇᴀᴍxʙᴏᴛᴢ'} \n\n🧾 <u>Your Requested Files Are Here</u> 👇 \n\n</b>"
+            cap = f"<b>Query:</b> <b>{query}</b>
+
+<b>IMDb Data:</b>
+
+<b>🏷 Title:</b> <b><a href="{url}">{title}</a></b><br>
+<b>🎭 Genres:</b> <b>{genres}</b><br>
+<b>📆 Year:</b> <b><a href="{url}/releaseinfo">{year}</a></b><br>
+<b>🌟 Rating:</b> <b><a href="{url}/ratings">{rating}</a></b> <b>/ 10 (based on {votes} user ratings)</b><br>
+<b>☀️ Languages:</b> <b><code>{languages}</code></b><br>
+<b>📀 RunTime:</b> <b>{runtime} Minutes</b><br>
+<b>📆 Release Info:</b> <b>{release_date}</b><br>
+<b>🎛 Countries:</b> <b><code>{countries}</code></b><br><br>
+
+<b>⏰ Result Shown in:</b> <b><i>{remaining_seconds}</i> seconds</b> 🔥<br><br>
+
+<b>Requested by:</b> <b>{message.from_user.mention}</b>"
         else:
-            cap = f"<b>🏷 ᴛɪᴛʟᴇ : <code>{search}</code>\n🧱 ᴛᴏᴛᴀʟ ꜰɪʟᴇꜱ : <code>{total_results}</code>\n⏰ ʀᴇsᴜʟᴛ ɪɴ : <code>{remaining_seconds} Sᴇᴄᴏɴᴅs</code>\n\n📝 ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ : {message.from_user.mention}\n⚜️ ᴘᴏᴡᴇʀᴇᴅ ʙʏ : ⚡ {message.chat.title or temp.B_LINK or 'ᴅʀᴇᴀᴍxʙᴏᴛᴢ'} \n\n🧾 <u>Your Requested Files Are Here</u> 👇 \n\n</b>"
+            cap = f"<b>Query:</b> <b>{query}</b>
+
+<b>IMDb Data:</b>
+
+<b>🏷 Title:</b> <b><a href="{url}">{title}</a></b><br>
+<b>🎭 Genres:</b> <b>{genres}</b><br>
+<b>📆 Year:</b> <b><a href="{url}/releaseinfo">{year}</a></b><br>
+<b>🌟 Rating:</b> <b><a href="{url}/ratings">{rating}</a></b> <b>/ 10 (based on {votes} user ratings)</b><br>
+<b>☀️ Languages:</b> <b><code>{languages}</code></b><br>
+<b>📀 RunTime:</b> <b>{runtime} Minutes</b><br>
+<b>📆 Release Info:</b> <b>{release_date}</b><br>
+<b>🎛 Countries:</b> <b><code>{countries}</code></b><br><br>
+
+<b>⏰ Result Shown in:</b> <b><i>{remaining_seconds}</i> seconds</b> 🔥<br><br>
+
+<b>Requested by:</b> <b>{message.from_user.mention}</b>"
 
             for idx, file in enumerate(files, start=1):
                 cap += f"<b>\n{idx}. <a href='https://telegram.me/{temp.U_NAME}?start=file_{message.chat.id}_{file.file_id}'>[{get_size(file.file_size)}] {clean_filename(file.file_name)}\n</a></b>"
